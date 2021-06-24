@@ -148,7 +148,7 @@ end
 
 
 function plotIce(X,U,ω,ylim=[-2,2],Ref=:none)
-    plt = lineplot(X*Lc,real(U[:,1]), width = 80, xlim = [minimum(X*Lc), maximum(X*Lc)],
+    plt = lineplot(X*Lc,real(U[:,1]), width = 40, xlim = [minimum(X*Lc), maximum(X*Lc)],
                    ylim=ylim,
                    xlabel="x in m",
                    ylabel="η(x,ω) in m",
@@ -170,7 +170,7 @@ function plotMode(ω, λ, N)
                  xlim = [minimum(ω), maximum(ω)],
                  xlabel="ω in s⁻¹",
                  ylabel="|λ|",
-                 name="Euler Bernoulli Mode Number "*string(N[1])*" vs ω"
+                 name="Euler Bernoulli Mode Number "*string(N[1])*" vs ω",
                  border=:ascii)
     if(length(N)>1)
         for n ∈ 2:length(N)
