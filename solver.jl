@@ -153,7 +153,8 @@ function plotIce(X,U,ω,ylim=[-2,2],Ref=:none)
                    xlabel="x in m",
                    ylabel="η(x,ω) in m",
                    title="Displacement of Ice for incident T = "*string(round(2π/ω))*" s",
-                   name="Real part")
+                   name="Real part",
+                   border=:ascii)
     lineplot!(plt,X*Lc,imag(U[:,1]),color=:red, name="Imaginary Part")
     if(Ref==:none || typeof(Ref)!=Matrix{ComplexF64})
         return plt
@@ -169,7 +170,8 @@ function plotMode(ω, λ, N)
                  xlim = [minimum(ω), maximum(ω)],
                  xlabel="ω in s⁻¹",
                  ylabel="|λ|",
-                 name="Euler Bernoulli Mode Number "*string(N[1])*" vs ω")
+                 name="Euler Bernoulli Mode Number "*string(N[1])*" vs ω"
+                 border=:ascii)
     if(length(N)>1)
         for n ∈ 2:length(N)
             i = N[n]
