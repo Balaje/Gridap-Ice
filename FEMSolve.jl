@@ -52,7 +52,7 @@ function buildReducedSystem(μ, ϕ₀, ϕⱼ, α, β, γ, Γ, L, ω, V)
     AB=zeros(ComplexF64, nev, nev);
     F=zeros(ComplexF64,nev,1);
 
-    φ₀=FEFunction(V, real(ϕ₀))+1im*FEFunction(V, imag(ϕ₀));
+    φ₀=FEFunction(V, ϕ₀)
     for i=1:nev
         μₘ=μ[i];
         η(x)=((cos(L*μₘ) + cosh(L*μₘ))*(sin(μₘ*x[1]) + sinh(μₘ*x[1]))-
@@ -66,7 +66,7 @@ function buildReducedSystem(μ, ϕ₀, ϕⱼ, α, β, γ, Γ, L, ω, V)
         K[i,i]=β*μₘ^4*B[i,i];
         F[i]=(1im*ω/10)*sum(∫(η*φ₀)*dΓ);
 
-        φₖ=FEFunction(V,real(ϕⱼ[:,i])) + 1im*FEFunction(V,imag(ϕⱼ[:,i]));
+        φₖ=FEFunction(V,ϕⱼ[:,i])
         for j=1:nev
             μₘ=μ[j];
             ξ(x)=((cos(L*μₘ) + cosh(L*μₘ))*(sin(μₘ*x[1]) + sinh(μₘ*x[1]))-

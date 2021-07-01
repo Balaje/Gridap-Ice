@@ -56,7 +56,7 @@ function solveIceVibration(L=10000, h=200, H=800, nev=10, N=5, ω=2*π/200)
     Γf₃=BoundaryTriangulation(cavModel,cavLabels,tags="neumannIce"); # Shelf/Cavity
     Γf₄=BoundaryTriangulation(cavModel,cavLabels,tags="NonLocal"); # Non-Local
     reffe=ReferenceFE(lagrangian,Float64,1);
-    Vfₕ=TestFESpace(cavModel,reffe,conformity=:H1); #Test space for cavity.
+    Vfₕ=FESpace(cavModel,reffe,conformity=:H1,vector_type=ComplexF64); #Test space for cavity.
 
     # ------ Get the non-local boundary condition
     Qϕ,χ=getMQχ(k, kd, HH, dd, N, Ap, cavModel, Γf₄, Vfₕ, Vfₕ);
@@ -74,30 +74,23 @@ function solveIceVibration(L=10000, h=200, H=800, nev=10, N=5, ω=2*π/200)
     K,f,op=getLaplaceMatEB(Ωf, Γf₃, Vfₕ, Vfₕ, Qϕ, χ, 0, LL, 0)
     ϕ₀=K\f;
     # Compute diffraction refcoeffs
-    real_uh=FEFunction(Vfₕ,real(ϕ₀[:,1]))
-    imag_uh=FEFunction(Vfₕ,imag(ϕ₀[:,1]))
-    real_Ref = getRefCoeff(real_uh, N, k, kd, HH, dd, Γf₄, Ap)
-    imag_Ref = getRefCoeff(imag_uh, N, k, kd, HH, dd, Γf₄, Ap)
-    RefDiff = zeros(ComplexF64, 2, 1)
-    RefDiff[1] = real_Ref[1]
-    RefDiff[2] = imag_Ref[1]
+    uh = FEFunction(Vfₕ,ϕ₀)
+    Ref = getRefCoeff(uh, N, k, kd, HH, dd, Γf₄, Ap)
+    RefDiff = Ref[1]
 
     # Radiation potential from the Eigenmodes
     μ=solveEigenEB(nev, LL);# Obtain the Eigenvalues for the beam equation
     ϕₖ=zeros(ComplexF64,length(χ),nev)
-    RefModes=zeros(ComplexF64, 2, nev)
+    RefModes=zeros(ComplexF64, 1, nev)
     for m=1:nev
         Km,fm,op1=getLaplaceMatEB(Ωf, Γf₃, Vfₕ, Vfₕ, Qϕ, 0*χ, μ[m], LL, ω*Lc)
         ϕₖ[:,m]=Km\fm; # Using the linear algebra package (raw vector)
 
         # Compute modal refcoeffs
         POTₖ=ϕₖ[:,m]
-        real_uh=FEFunction(Vfₕ,real(POTₖ[:,1]))
-        imag_uh=FEFunction(Vfₕ,imag(POTₖ[:,1]))
-        real_Ref = getRefModes(real_uh, N, k, kd, HH, dd, Γf₄, Ap)
-        imag_Ref = getRefModes(imag_uh, N, k, kd, HH, dd, Γf₄, Ap)
-        RefModes[1,m] = real_Ref[1]
-        RefModes[2,m] = imag_Ref[1]
+        uh=FEFunction(Vfₕ,POTₖ)
+        Ref = getRefModes(uh, N, k, kd, HH, dd, Γf₄, Ap)
+        RefModes[1,m] = Ref[1]
     end
     #print("Done computing potentials\n")
     # -----------------------------------------
@@ -130,23 +123,16 @@ function solveIceVibration(L=10000, h=200, H=800, nev=10, N=5, ω=2*π/200)
     # Construct the velocity potential
     POT=ϕ₀+ϕₖ*λ
     #Compute the reflection coefficient
-    real_uh=FEFunction(Vfₕ,real(POT[:,1]))
-    imag_uh=FEFunction(Vfₕ,imag(POT[:,1]))
+    uh=FEFunction(Vfₕ,POT[:,1])
     #writevtk(Ωf,"results",cellfields=["uh"=>uh]); #To visualize the solution.
-    real_Ref = getRefCoeff(real_uh, N, k, kd, HH, dd, Γf₄, Ap)
-    imag_Ref = getRefCoeff(imag_uh, N, k, kd, HH, dd, Γf₄, Ap)
-    Ref = real_Ref .+ 1im*(imag_Ref .+ 1) # Don't know how but works 😉
+    Ref = getRefCoeff(uh, N, k, kd, HH, dd, Γf₄, Ap)
 
     H = K+AB+B
-    return H, F, Ref, RefModes, RefDiff, X, U, Lc
-end
-
-function buildRefCoeff(RefDiff, RefModes, λ)
-    X1=RefDiff + RefModes*λ
-    (2 .+ X1)[1]
+    return H, F, Ref[1], RefModes, RefDiff, X, U, Lc
 end
 
 
+# Plotting functions in the terminal
 function plotIce(X,U,ω,ylim=[-2,2],Ref=:none)
     plt = lineplot(X*Lc,real(U[:,1]), width = 40, xlim = [minimum(X*Lc), maximum(X*Lc)],
                    ylim=ylim,
