@@ -128,20 +128,19 @@ function solveIceVibration(L=10000, h=200, H=800, nev=10, N=5, ω=2*π/200)
     Ref = getRefCoeff(uh, N, k, kd, HH, dd, Γf₄, Ap)
 
     H = K+AB+B
-    return H, F, Ref[1], RefModes, RefDiff, X, U, Lc
+    return H, F, Ref, RefModes, RefDiff, X, U, Lc
 end
-
 
 # Plotting functions in the terminal
 function plotIce(X,U,ω,ylim=[-2,2],Ref=:none)
-    plt = lineplot(X*Lc,real(U[:,1]), width = 40, xlim = [minimum(X*Lc), maximum(X*Lc)],
+    plt = lineplot(X,real(U[:,1]), width = 100, xlim = [minimum(X), maximum(X)],
                    ylim=ylim,
                    xlabel="x in m",
                    ylabel="η(x,ω) in m",
                    title="Displacement of Ice for incident T = "*string(round(2π/ω))*" s",
                    name="Real part",
                    border=:ascii)
-    lineplot!(plt,X*Lc,imag(U[:,1]),color=:red, name="Imaginary Part")
+    lineplot!(plt,X,imag(U[:,1]),color=:red, name="Imaginary Part")
     if(Ref==:none || typeof(Ref)!=Matrix{ComplexF64})
         return plt
     else
@@ -152,7 +151,7 @@ function plotIce(X,U,ω,ylim=[-2,2],Ref=:none)
 end
 
 function plotMode(ω, λ, N)
-    plt=lineplot(ω, abs.(λ[N[1],:]), width = 80,
+    plt=lineplot(ω, abs.(λ[N[1],:]), width = 100,
                  xlim = [minimum(ω), maximum(ω)],
                  xlabel="ω in s⁻¹",
                  ylabel="|λ|",
@@ -162,9 +161,37 @@ function plotMode(ω, λ, N)
         for n ∈ 2:length(N)
             i = N[n]
             lineplot!(plt, collect(ω), abs.(λ[i,:]),
-                         name="Euler Bernoulli Mode Number "*string(i)*" vs ω")
+                      name="Euler Bernoulli Mode Number "*string(i)*" vs ω")
         end
     end
     plt
 
+end
+
+function plotRefCoeff(ω, Rω)
+    plt=lineplot(ω, real(Rω), width = 100,
+                 xlim = [minimum(ω), maximum(ω)],
+                 ylim = [-1,1],
+                 xlabel="ω in s⁻¹",
+                 ylabel="R(ω)",
+                 name="Real part of R(ω)",
+                 title="Reflection coefficient in the real axis",
+                 border=:ascii)
+    lineplot!(plt,ω,imag(Rω),color=:red, name="Imaginary part of R(ω)")
+    plt
+end
+
+function plotComplexRefCoeff(a, b, c, d, Rω)
+    # Set the width
+    width=100
+    height=30
+    N = size(Rω,1)
+    xscale = (b-a)/(N-1)
+    yscale = (d-c)/(N-1)
+    plt=heatmap(portrait(Rω),width=width,height=height,
+                xscale=xscale,yscale=yscale,xoffset=a,yoffset=c,
+                xlabel="Re(ω) in s⁻¹",
+                ylabel="Im(ω) in s⁻¹",
+                title="Reflection coefficient on the complex plane",
+                border=:ascii)
 end

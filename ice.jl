@@ -5,6 +5,7 @@ using Roots
 using SparseArrays
 using Interpolations
 using UnicodePlots
+using ComplexPhasePortrait
 
 # Add packages
 include("dispersion.jl")
