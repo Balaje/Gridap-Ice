@@ -2,9 +2,8 @@
 
 The ice-shelf is modelled using the Euler-Bernoulli thin-plate theory which is in turn coupled with the fluid, modelled using the potential flow theory. The velocity potential in the fluid is solved using the finite element method, implemented using [Gridap.jl](https://github.com/gridap/Gridap.jl). The plots are generated using [UnicodePlots.jl](https://github.com/Evizero/UnicodePlots.jl). Several more functions will be added to the program. If you are here, also check out [iceFEM](https://github.com/Balaje/iceFem).
 
-**Warning: Work in Progress**
-
-A lot needs to be tested and optimized. But there is a minimum working code, and you could visualize everything using the command line.
+### Warning: Work in Progress
+A lot needs to be tested and optimized. But there is a minimum working code, and you could visualize everything using the command line. This repository will eventually be linked to [iceFEM](https://github.com/Balaje/iceFem) (after I make the code a little bit faster ...)
 
 # How to test
 
@@ -134,8 +133,7 @@ While complex resonances are colorful, I can't find a way to export the complex 
 
 Here you go.
 
--- |
-![complex-resonance](Images/complex-refcoeff)
+![complex-resonance](./Images/complex-refcoeff.png) |
 -- |
 
 To get this plot in your computer, run
@@ -149,5 +147,3 @@ julia> plotRefCoeff(ω₂, Ref₂)
 
 julia> plotComplexRefCoeff(a,b,c,d,Ref₃)
 ```
-
-**This repository will eventually be linked to [iceFEM](https://github.com/Balaje/iceFem).**
