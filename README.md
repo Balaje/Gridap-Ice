@@ -4,6 +4,8 @@ The ice-shelf is modelled using the Euler-Bernoulli thin-plate theory which is i
 
 **Warning: Work in Progress**
 
+A lot needs to be tested and optimized. But there is a minimum working code, and you could visualize everything using the command line.
+
 # How to test
 
 First load all the functions using
@@ -124,6 +126,28 @@ julia> plotMode(ω_new, λ_new, 1:3_
 
 julia> plotMode(ω_new, λ_new, [1,5,10])
 
+```
+
+## Complex Resonances
+
+While complex resonances are colorful, I can't find a way to export the complex plot into plain text, like the above images. So I opt to use an image instead.
+
+Here you go.
+
+-- |
+![complex-resonance](Images/complex-refcoeff)
+-- |
+
+To get this plot in your computer, run
+
+``` julia
+julia> include("ice.jl")
+
+julia> include("example.jl") # Takes a while (≈ 5 min) to run, go grab a coffee!
+
+julia> plotRefCoeff(ω₂, Ref₂)
+
+julia> plotComplexRefCoeff(a,b,c,d,Ref₃)
 ```
 
 **This repository will eventually be linked to [iceFEM](https://github.com/Balaje/iceFem).**
